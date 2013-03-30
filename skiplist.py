@@ -122,25 +122,4 @@ class skiplist:
             self._max_levels -= 1
         del node
         self._size -= 1
-        
 
-
-
-
-
-
-
-
-
-
-        
-if __name__ == '__main__':
-    new = skiplist(0.5)
-    for i in range(1, 6):
-        new.insert(i)
-    print new
-    print new[2]
-    new.remove(3)
-    new.remove(5)
-    print new
-    print new['not here']
