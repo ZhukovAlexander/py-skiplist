@@ -1,8 +1,17 @@
 """Dat skiplist"""
 
-from numpy.random import geometric
 from math import log
 
+try:
+    from numpy.random import geometric
+except ImportError():
+    import random
+    def geometric(p):
+        n = 1
+        while random.randint(1, int(1/p)) == 1:
+            n += 1
+        return n
+    
 class NIL(object):
     'Sentinel object that always compares greater than another object'
     def __cmp__(self, other):
@@ -29,7 +38,6 @@ class skiplist:
         self._p = p
         self._max_levels = 1
         self._size = 0
-        
         self.head = skipnode('HEAD',[nil]*self._max_levels)
         self.distribution = distribution
         
@@ -37,8 +45,7 @@ class skiplist:
         return self._size
     
     def __str__(self):
-        s = map(str, [node.data
-                      for node in self])
+        s = map(str, [node.data for node in self])
         return '->'.join(s)
         
     def __getitem__(self, data):
@@ -51,36 +58,42 @@ class skiplist:
         while node is not nil:
             yield node#.data
             node = node.next[0]
-        
+
+    def _find_update(self, data):
+        update = [None]*self._max_levels
+        node = self.head
+        for level in reversed(range(self._max_levels)):
+            while node.next[level].data < data:
+                node = node.next[level]
+            update[level] = node
+        return update
+    
     def find(self, data):
         '''Find node with given data'''
         n = len(self)
         L=int(log(1.0/self._p, n)) if self._size>=16 else self._max_levels
         node = self.head
         for level in reversed(range(L)):
-            node = self.head.next[level]
-            while node is not nil:
-                if node.data > data:    break
-                elif data == node.data: return node.data
+            while node.next[level].data <= data:
+                if data == node.next[level].data:
+                    return node.next[level].data
                 node = node.next[level]
+        raise KeyError('Not found')
 
     def insert(self, data):
         '''Inserts data into appropriate position.'''
-        update = [None]*self._max_levels
-        node = self.head
+        
         #find position to insert
-        for level in reversed(range(self._max_levels)):
-            while node.next[level].data <= data:
-                node = node.next[level]
-            update[level] = node
+        update = self._find_update(data)
         node_height = self.distribution(self._p)
         newnode = skipnode(data, [None]*node_height)
-        steps = 0
+        
         #if node's height is greater than number of levels
         #then add new levels, if not do nothing
         for level in range(self._max_levels, node_height):
             update.append(self.head)
             self.head.next.append(nil)
+            
         #insert node to each level <= node's height after
         #corresponding node in 'update' list
         for level in range(node_height):
@@ -94,12 +107,8 @@ class skiplist:
     def remove(self, data):
         '''Removes node with given data. Raises KeyError if
             data is not in list.'''
-        update = [None]*self._max_levels
-        node = self.head
-        for level in reversed(range(self._max_levels)):
-            while node.next[level].data < data:
-                node = node.next[level]
-            update[level] = node
+        
+        update = self._find_update(data)
         if data != update[0].next[0].data:
             raise KeyError('Not found')
 
@@ -130,6 +139,8 @@ if __name__ == '__main__':
     for i in range(1, 6):
         new.insert(i)
     print new
-    print new[3]
+    print new[2]
     new.remove(3)
+    new.remove(5)
     print new
+    print new['not here']
