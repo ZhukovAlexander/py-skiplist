@@ -12,8 +12,9 @@ except ImportError():
             n += 1
         return n
     
-class NIL(object):
+class NIL:
     'Sentinel object that always compares greater than another object'
+    __slots__ = ()
     def __cmp__(self, other):
         return 1
 
@@ -21,7 +22,9 @@ class NIL(object):
         return 'NIL'
 
 class skipnode(object):
-
+    
+    __slots__ = ('data', 'next')
+    
     def __init__(self, data, next):
         self.data = data
         self.next = next
