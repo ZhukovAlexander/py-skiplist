@@ -1,4 +1,3 @@
-"""Dat skiplist"""
 
 from math import log
 
@@ -21,7 +20,7 @@ class NIL:
     def __str__(self):
         return 'NIL'
 
-class skipnode(object):
+class _Skipnode(object):
     
     __slots__ = ('data', 'next')
     
@@ -29,9 +28,9 @@ class skipnode(object):
         self.data = data
         self.next = next
         
-nil = skipnode(NIL(), [])
+nil = _Skipnode(NIL(), [])
         
-class skiplist:
+class Skiplist(object):
 
     """Class for randomized indexed skip list. The default
     distribution of node heights is geometric."""
@@ -41,7 +40,7 @@ class skiplist:
         self._p = p
         self._max_levels = 1
         self._size = 0
-        self.head = skipnode('HEAD',[nil]*self._max_levels)
+        self.head = _Skipnode('HEAD',[nil]*self._max_levels)
         self.distribution = distribution
         
     def __len__(self):
@@ -49,7 +48,7 @@ class skiplist:
     
     def __str__(self):
         s = map(str, [node.data for node in self])
-        return '->'.join(s)
+        return 'skiplist({})'.format([node.data for node in self])
         
     def __getitem__(self, data):
         '''Returns item with given index'''
@@ -89,7 +88,7 @@ class skiplist:
         #find position to insert
         update = self._find_update(data)
         node_height = self.distribution(self._p)
-        newnode = skipnode(data, [None]*node_height)
+        newnode = _Skipnode(data, [None]*node_height)
         
         #if node's height is greater than number of levels
         #then add new levels, if not do nothing
@@ -126,3 +125,8 @@ class skiplist:
         del node
         self._size -= 1
 
+if __name__=='__main__':
+    s = Skiplist()
+    for i in range(10):
+        s.insert(i)
+    print s
