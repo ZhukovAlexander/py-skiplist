@@ -24,14 +24,15 @@ class NIL(object):
 
 
 class _Skipnode(object):
-    __slots__ = ('data', 'next')
+    __slots__ = ('data', 'next', 'key')
 
-    def __init__(self, data, nxt):
+    def __init__(self, key, data, nxt):
+        self.key = key
         self.data = data
         self.next = nxt
 
 
-nil = _Skipnode(NIL(), [])
+nil = _Skipnode(NIL(), [], None)
 
 
 class Skiplist(object):
@@ -43,7 +44,7 @@ class Skiplist(object):
         self._p = p
         self._max_levels = 1
         self._size = 0
-        self.head = _Skipnode('HEAD', [nil] * self._max_levels)
+        self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels)
         self.distribution = distribution
 
     def __len__(self):
@@ -52,45 +53,45 @@ class Skiplist(object):
     def __str__(self):
         return 'skiplist({})'.format([node.data for node in self])
 
-    def __getitem__(self, data):
-        '''Returns item with given index'''
-        return self.find(data)
+    def __getitem__(self, key):
+        """Returns item with given index"""
+        return self.find(key)
 
     def __iter__(self):
-        'Iterate over values in sorted order'
+        """Iterate over values in sorted order"""
         node = self.head.next[0]
         while node is not nil:
             yield node  # .data
             node = node.next[0]
 
-    def _find_update(self, data):
+    def _find_update(self, key):
         update = [None] * self._max_levels
         node = self.head
         for level in reversed(range(self._max_levels)):
-            while node.next[level].data < data:
+            while node.next[level].key < key:
                 node = node.next[level]
             update[level] = node
         return update
 
-    def find(self, data):
+    def find(self, key):
         """Find node with given data"""
         n = len(self)
         l = int(log(1.0 / self._p, n)) if self._size >= 16 else self._max_levels
         node = self.head
         for level in reversed(range(l)):
-            while node.next[level].data <= data:
-                if data == node.next[level].data:
-                    return node.next[level].data
+            while node.next[level].key <= key:
+                if key == node.next[level].key:
+                    return node.next[level].key
                 node = node.next[level]
         raise KeyError('Not found')
 
-    def insert(self, data):
+    def insert(self, key, data):
         """Inserts data into appropriate position."""
 
         # find position to insert
-        update = self._find_update(data)
+        update = self._find_update(key)
         node_height = self.distribution(self._p)
-        new_node = _Skipnode(data, [None] * node_height)
+        new_node = _Skipnode(key, data, [None] * node_height)
 
         #if node's height is greater than number of levels
         #then add new levels, if not do nothing
@@ -107,11 +108,11 @@ class Skiplist(object):
         self._size += 1
         self._max_levels = max(self._max_levels, node_height)
 
-    def remove(self, data):
+    def remove(self, key):
         """Removes node with given data. Raises KeyError if data is not in list."""
 
-        update = self._find_update(data)
-        if data != update[0].next[0].data:
+        update = self._find_update(key)
+        if key != update[0].next[0].key:
             raise KeyError('Not found')
 
         node = update[0].next[0]
