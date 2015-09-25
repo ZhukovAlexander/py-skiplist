@@ -1,15 +1,16 @@
 from math import log
 
-try:
-    from numpy.random import geometric
-except ImportError:
-    import random
+import random
 
-    def geometric(p):
-        n = 1
-        while random.randint(1, int(1 / p)) == 1:
-            n += 1
-        return n
+
+def geometric(p):
+    def distribution():
+        while 1:
+            n = 1
+            while random.randint(1, int(1 / p)) == 1:
+                n += 1
+            yield n
+    return distribution()
 
 
 class NIL(object):
@@ -32,7 +33,7 @@ class _Skipnode(object):
         self.next = nxt
 
 
-nil = _Skipnode(NIL(), [], None)
+nil = _Skipnode(NIL(), None, [])
 
 
 class Skiplist(object):
@@ -45,17 +46,23 @@ class Skiplist(object):
         self._max_levels = 1
         self._size = 0
         self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels)
-        self.distribution = distribution
+        self.distribution = distribution(p)
 
     def __len__(self):
         return self._size
 
     def __str__(self):
-        return 'skiplist({})'.format([node.data for node in self])
+        return 'skiplist({})'.format([node.key for node in self])
 
     def __getitem__(self, key):
         """Returns item with given index"""
-        return self.find(key)
+        return self.find_node(key).data
+
+    def __setitem__(self, key, value):
+        return self.insert(key, value)
+
+    def __delitem__(self, key):
+        self.remove(key)
 
     def __iter__(self):
         """Iterate over values in sorted order"""
@@ -73,7 +80,7 @@ class Skiplist(object):
             update[level] = node
         return update
 
-    def find(self, key):
+    def find_node(self, key):
         """Find node with given data"""
         n = len(self)
         l = int(log(1.0 / self._p, n)) if self._size >= 16 else self._max_levels
@@ -81,32 +88,36 @@ class Skiplist(object):
         for level in reversed(range(l)):
             while node.next[level].key <= key:
                 if key == node.next[level].key:
-                    return node.next[level].key
+                    return node.next[level]
                 node = node.next[level]
         raise KeyError('Not found')
 
     def insert(self, key, data):
         """Inserts data into appropriate position."""
 
-        # find position to insert
-        update = self._find_update(key)
-        node_height = self.distribution(self._p)
-        new_node = _Skipnode(key, data, [None] * node_height)
+        try:
+            self.find_node(key).data = data
+        except KeyError:
 
-        #if node's height is greater than number of levels
-        #then add new levels, if not do nothing
-        for level in range(self._max_levels, node_height):
-            update.append(self.head)
-            self.head.next.append(nil)
+            # find position to insert
+            update = self._find_update(key)
+            node_height = next(self.distribution)
+            new_node = _Skipnode(key, data, [None] * node_height)
 
-        #insert node to each level <= node's height after
-        #corresponding node in 'update' list
-        for level in range(node_height):
-            prev_node = update[level]
-            new_node.next[level] = prev_node.next[level]
-            prev_node.next[level] = new_node
-        self._size += 1
-        self._max_levels = max(self._max_levels, node_height)
+            #if node's height is greater than number of levels
+            #then add new levels, if not do nothing
+            for level in range(self._max_levels, node_height):
+                update.append(self.head)
+                self.head.next.append(nil)
+
+            #insert node to each level <= node's height after
+            #corresponding node in 'update' list
+            for level in range(node_height):
+                prev_node = update[level]
+                new_node.next[level] = prev_node.next[level]
+                prev_node.next[level] = new_node
+            self._size += 1
+            self._max_levels = max(self._max_levels, node_height)
 
     def remove(self, key):
         """Removes node with given data. Raises KeyError if data is not in list."""
