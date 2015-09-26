@@ -40,13 +40,16 @@ class Skiplist(object):
     """Class for randomized indexed skip list. The default
     distribution of node heights is geometric."""
 
-    def __init__(self, p=0.5, distribution=geometric):
+    def __init__(self, p=0.5, distribution=geometric, **kwargs):
 
         self._p = p
         self._max_levels = 1
         self._size = 0
         self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels)
         self.distribution = distribution(p)
+
+        for k, v in kwargs.iteritems():
+            self[k] = v
 
     def __len__(self):
         return self._size

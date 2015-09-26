@@ -25,6 +25,12 @@ class SkipListTestCase(unittest.TestCase):
         del sl['what']
         self.assertRaises(KeyError, lambda: sl['what'])
 
+    def test_init(self):
+        sl = Skiplist(a=1, b=2)
+        self.assertEqual(sl['a'], 1)
+        self.assertEqual(sl['b'], 2)
+        self.assertEqual(len(sl), 2)
+
     def test_str(self):
         sl = Skiplist()
         self.assertEqual('skiplist([])', str(sl))
