@@ -25,5 +25,10 @@ class SkipListTestCase(unittest.TestCase):
         del sl['what']
         self.assertRaises(KeyError, lambda: sl['what'])
 
+    def test_str(self):
+        sl = Skiplist()
+        self.assertEqual('skiplist([])', str(sl))
+        sl['1'] = 1
+        self.assertEqual('skiplist([\'1\'])', str(sl))
 if __name__ == '__main__':
     unittest.main()
