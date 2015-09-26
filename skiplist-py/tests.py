@@ -24,6 +24,7 @@ class SkipListTestCase(unittest.TestCase):
         self.assertTrue(sl['what'])
         del sl['what']
         self.assertRaises(KeyError, lambda: sl['what'])
+        self.assertRaises(KeyError, lambda: sl.remove('not here'))
 
     def test_init(self):
         sl = Skiplist(a=1, b=2)
