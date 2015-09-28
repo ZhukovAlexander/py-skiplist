@@ -110,14 +110,14 @@ class Skiplist(object):
             node_height = next(self.distribution)
             new_node = _Skipnode(key, data, [None] * node_height)
 
-            #if node's height is greater than number of levels
-            #then add new levels, if not do nothing
+            # if node's height is greater than number of levels
+            # then add new levels, if not do nothing
             for level in range(self._max_levels, node_height):
                 update.append(self.head)
                 self.head.next.append(nil)
 
-            #insert node to each level <= node's height after
-            #corresponding node in 'update' list
+            # insert node to each level <= node's height after
+            # corresponding node in 'update' list
             for level in range(node_height):
                 prev_node = update[level]
                 new_node.next[level] = prev_node.next[level]
