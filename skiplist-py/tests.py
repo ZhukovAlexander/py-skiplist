@@ -1,6 +1,11 @@
 import unittest
 
-from skiplist import Skiplist
+from skiplist import Skiplist, NIL
+
+
+class DataStructTestCase(unittest.TestCase):
+    def test_nil_always_false(self):
+        self.assertFalse(NIL())
 
 
 class SkipListTestCase(unittest.TestCase):

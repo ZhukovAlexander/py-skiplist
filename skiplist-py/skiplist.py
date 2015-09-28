@@ -23,6 +23,9 @@ class NIL(object):
     def __str__(self):
         return 'NIL'
 
+    def __nonzero__(self):
+        return False
+
 
 class _Skipnode(object):
     __slots__ = ('data', 'next', 'key')
