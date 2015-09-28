@@ -130,7 +130,7 @@ class Skiplist(object):
 
         update = self._find_update(key)
         if key != update[0].next[0].key:
-            raise KeyError('Not found')
+            raise KeyError
 
         node = update[0].next[0]
         node_height = len(node.next)
@@ -142,4 +142,3 @@ class Skiplist(object):
             self._max_levels -= 1
         del node
         self._size -= 1
-
