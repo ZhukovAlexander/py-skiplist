@@ -1,6 +1,7 @@
 import unittest
 
 from skiplist import Skiplist, NIL
+from iterators import LevelNodeIterator
 
 
 class DataStructTestCase(unittest.TestCase):
@@ -42,5 +43,13 @@ class SkipListTestCase(unittest.TestCase):
         self.assertEqual('skiplist([])', str(sl))
         sl['1'] = 1
         self.assertEqual('skiplist([\'1\'])', str(sl))
+
+
+class LevelIteratorTestCase(unittest.TestCase):
+    def test_iterator_default(self):
+        s = Skiplist(foo=1, bar=2)
+        self.assertListEqual(sorted(['foo', 'bar']), sorted(node.key for node in LevelNodeIterator(s)))
+
+
 if __name__ == '__main__':
     unittest.main()
