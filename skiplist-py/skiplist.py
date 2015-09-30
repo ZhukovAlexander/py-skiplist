@@ -2,6 +2,7 @@ from math import log
 
 import random
 
+from iterators import LevelNodeIterator
 
 def geometric(p):
     def distribution():
@@ -81,6 +82,10 @@ class Skiplist(object):
         update = [None] * self._max_levels
         node = self.head
         for level in reversed(range(self._max_levels)):
+            # for node in LevelNodeIterator(self, level):
+            #     if node.next[level].key >= key:
+            #         update[level] = node
+            #         break
             while node.next[level].key < key:
                 node = node.next[level]
             update[level] = node
@@ -92,10 +97,13 @@ class Skiplist(object):
         l = int(log(1.0 / self._p, n)) if self._size >= 16 else self._max_levels
         node = self.head
         for level in reversed(range(l)):
-            while node.next[level].key <= key:
-                if key == node.next[level].key:
-                    return node.next[level]
-                node = node.next[level]
+            for node in LevelNodeIterator(self, level):
+                if node.key == key:
+                    return node
+            # while node.next[level].key <= key:
+            #     if key == node.next[level].key:
+            #         return node.next[level]
+            #     node = node.next[level]
         raise KeyError('Not found')
 
     def insert(self, key, data):
