@@ -61,7 +61,9 @@ class Skiplist(collections.MutableMapping):
         return self._size
 
     def __str__(self):
-        return 'skiplist({})'.format([node.key for node in self])
+        return 'skiplist({{{}}})'.format(
+            ','.join('{key}: {value}'.format(key=node.key, value=node.data) for node in LevelNodeIterator(self))
+        )
 
     def __getitem__(self, key):
         """Returns item with given index"""
@@ -75,10 +77,7 @@ class Skiplist(collections.MutableMapping):
 
     def __iter__(self):
         """Iterate over values in sorted order"""
-        node = self.head.next[0]
-        while node is not nil:
-            yield node  # .data
-            node = node.next[0]
+        return (node.key for node in LevelNodeIterator(self))
 
     def _find_update(self, key):
         update = [None] * self._max_levels
@@ -147,3 +146,13 @@ class Skiplist(collections.MutableMapping):
             self._max_levels -= 1
         del node
         self._size -= 1
+
+    def iteritems(self):
+        return ((node.key, node.data) for node in LevelNodeIterator(self))
+
+    def iterkeys(self):
+        return (item[0] for item in self.iteritems())
+
+    def itervalues(self):
+        return (item[1] for item in self.iteritems())
+

@@ -15,6 +15,27 @@ class InterfaceTestCase(unittest.TestCase):
         self.assertTrue(issubclass(Skiplist, collections.MutableMapping),
                         msg='Skiplist should alway implement the MutableMapping interface')
 
+    def test_get(self):
+        sl = Skiplist(foo='bar')
+        self.assertEqual(sl.get('foo'), 'bar')
+        self.assertEqual(sl.get('None', 'baz'), 'baz')
+        self.assertIsNone(sl.get('Nothing'))
+
+    def test_contains(self):
+        sl = Skiplist(one=1)
+        self.assertIn('one', sl)
+        self.assertNotIn('two', sl)
+
+    def test_pop(self):
+        sl = Skiplist(john='Snow')
+        self.assertEqual(sl.pop('john'), 'Snow')
+        self.assertRaises(lambda: sl.pop('Sansa'))
+
+    def test_iteritems(self):
+        sl = Skiplist(one=1, two=2)
+        self.assertListEqual(sorted([('one', 1), ('two', 2)]),
+                             sorted(sl.iteritems()))
+
 
 class SkipListTestCase(unittest.TestCase):
 
@@ -47,9 +68,9 @@ class SkipListTestCase(unittest.TestCase):
 
     def test_str(self):
         sl = Skiplist()
-        self.assertEqual('skiplist([])', str(sl))
+        self.assertEqual('skiplist({})', str(sl))
         sl['1'] = 1
-        self.assertEqual('skiplist([\'1\'])', str(sl))
+        self.assertEqual('skiplist({1: 1})', str(sl))
 
 
 class LevelIteratorTestCase(unittest.TestCase):
