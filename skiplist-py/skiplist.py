@@ -3,7 +3,7 @@ from math import log
 import random
 import collections
 
-from iterators import LevelNodeIterator
+from iterators import LevelNodeIterator, AllNodesIterator
 
 
 def geometric(p):
@@ -93,14 +93,12 @@ class Skiplist(collections.MutableMapping):
         return update
 
     def find_node(self, key):
-        """Find node with given data"""
-        n = len(self)
-        l = int(log(1.0 / self._p, n)) if self._size >= 16 else self._max_levels
-        for level in reversed(range(l)):
-            for node in LevelNodeIterator(self, level):
-                if node.key == key:
-                    return node
-        raise KeyError('Not found')
+        """Find node with given key"""
+        l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels
+        for node in AllNodesIterator(self, l):
+            if node.key == key:
+                return node
+        raise KeyError('Key <{o}> not found'.format(key))
 
     def insert(self, key, data):
         """Inserts data into appropriate position."""
