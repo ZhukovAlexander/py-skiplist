@@ -1,4 +1,5 @@
 import unittest
+import collections
 
 from skiplist import Skiplist, NIL
 from iterators import LevelNodeIterator, AllNodesIterator
@@ -7,6 +8,12 @@ from iterators import LevelNodeIterator, AllNodesIterator
 class DataStructTestCase(unittest.TestCase):
     def test_nil_always_false(self):
         self.assertFalse(NIL())
+
+
+class InterfaceTestCase(unittest.TestCase):
+    def test_interface_methods_set(self):
+        self.assertTrue(issubclass(Skiplist, collections.MutableMapping),
+                        msg='Skiplist should alway implement the MutableMapping interface')
 
 
 class SkipListTestCase(unittest.TestCase):
