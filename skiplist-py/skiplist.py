@@ -1,6 +1,7 @@
 from math import log
 
 import random
+import collections
 
 from iterators import LevelNodeIterator
 
@@ -41,7 +42,7 @@ class _Skipnode(object):
 nil = _Skipnode(NIL(), None, [])
 
 
-class Skiplist(object):
+class Skiplist(collections.MutableMapping):
     """Class for randomized indexed skip list. The default
     distribution of node heights is geometric."""
 
