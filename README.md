@@ -4,7 +4,7 @@ skiplist-python
 An implementation of an indexed skip list data structure in python.
 
 [![Build Status](https://travis-ci.org/ZhukovAlexander/py-skiplist.svg?branch=master)](https://travis-ci.org/ZhukovAlexander/py-skiplist)
-[![Coverage Status](https://coveralls.io/repos/ZhukovAlexander/skiplist-python/badge.svg?branch=master&service=github)](https://coveralls.io/github/ZhukovAlexander/skiplist-python?branch=master)
+[![Coverage Status](https://coveralls.io/repos/ZhukovAlexander/py-skiplist/badge.svg?branch=master&service=github)](https://coveralls.io/github/ZhukovAlexander/py-skiplist?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ZhukovAlexander/py-skiplist/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ZhukovAlexander/py-skiplist/?branch=master)
 
 Intro
