@@ -90,3 +90,9 @@ decrease the maximum level of the list.
 **References**
 [*Skip list wikipedea article*](http://en.wikipedia.org/wiki/Skip_list),
 [*A Skip List Cookbook*](http://cg.scs.carleton.ca/~morin/teaching/5408/refs/p90b.pdf) by William Pugh
+
+[https://github.com/ryszard/goskiplist](https://github.com/ryszard/goskiplist)
+
+[http://tech.puredanger.com/2007/10/03/skip-lists/](http://tech.puredanger.com/2007/10/03/skip-lists/)
+
+[http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree](http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree)
