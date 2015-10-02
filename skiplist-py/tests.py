@@ -2,7 +2,7 @@ import unittest
 import collections
 
 from skiplist import Skiplist, NIL
-from iterators import LevelNodeIterator, AllNodesIterator
+from iterators import LevelNodeIterator, AllNodesIterator, geometric
 
 
 class DataStructTestCase(unittest.TestCase):
@@ -84,6 +84,14 @@ class AllNodesIteratorTestCase(unittest.TestCase):
         s = Skiplist(foo=1, bar=2)
         self.assertListEqual(sorted(['foo', 'bar']), sorted(node.key for node in AllNodesIterator(s, 1)))
 
+
+class DistributionTestCase(unittest.TestCase):
+    def test_geometric(self):
+        g = geometric(0.5)
+        expected = [0.5, 0.25, 0.125, 0.068]
+        sample = [next(g) for _ in range(10000)]
+        actual = [float(sum(1 for n in sample if n == t)) / len(sample) for t in [0, 1, 2, 3]]
+        self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)),  delta=0.01)
 
 if __name__ == '__main__':
     unittest.main()

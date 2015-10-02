@@ -1,3 +1,7 @@
+from itertools import dropwhile, count, cycle
+import random
+
+
 class LevelNodeIterator(object):
     def __init__(self, skip_list, level=0):
         self.s = skip_list
@@ -18,3 +22,8 @@ class AllNodesIterator(object):
 
     def __iter__(self):
         return (node for level in reversed(range(self.l_num)) for node in LevelNodeIterator(self.s, level))
+
+
+def geometric(p):
+    return (next(dropwhile(lambda _: random.randint(1, int(1. / p)) == 1, count())) for _ in cycle([1]))
+
