@@ -91,7 +91,7 @@ class DistributionTestCase(unittest.TestCase):
         expected = [0.5, 0.25, 0.125, 0.068]
         sample = [next(g) for _ in range(10000)]
         actual = [float(sum(1 for n in sample if n == t)) / len(sample) for t in [0, 1, 2, 3]]
-        self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)),  delta=0.01)
+        self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)), delta=0.01)
 
 if __name__ == '__main__':
     unittest.main()
