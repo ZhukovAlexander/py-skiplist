@@ -1,19 +1,8 @@
 from math import log
 
-import random
 import collections
 
-from iterators import LevelNodeIterator, AllNodesIterator
-
-
-def geometric(p):
-    def distribution():
-        while 1:
-            n = 1
-            while random.randint(1, int(1 / p)) == 1:
-                n += 1
-            yield n
-    return distribution()
+from iterators import LevelNodeIterator, AllNodesIterator, geometric
 
 
 class NIL(object):
@@ -109,7 +98,7 @@ class Skiplist(collections.MutableMapping):
 
             # find position to insert
             update = self._find_update(key)
-            node_height = next(self.distribution)
+            node_height = next(self.distribution) + 1  # because height should be positive non-zero
             new_node = _Skipnode(key, data, [None] * node_height)
 
             # if node's height is greater than number of levels
