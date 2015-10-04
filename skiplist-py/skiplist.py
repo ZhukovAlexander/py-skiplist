@@ -94,7 +94,7 @@ class Skiplist(collections.MutableMapping):
         for node in AllNodesIterator(self, l):
             if node.key == key:
                 return node
-        raise KeyError('Key <{o}> not found'.format(key))
+        raise KeyError('Key <{0}> not found'.format(key))
 
     def insert(self, key, data):
         """Inserts data into appropriate position."""
