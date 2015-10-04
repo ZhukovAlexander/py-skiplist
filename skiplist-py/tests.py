@@ -89,11 +89,14 @@ class AllNodesIteratorTestCase(unittest.TestCase):
 
 class DistributionTestCase(unittest.TestCase):
     def test_geometric(self):
-        g = geometric(0.5)
-        expected = [0.5, 0.25, 0.125, 0.068]
+        p = 0.5
+        g = geometric(p)
+        expected = [p**i for i in range(1, 5)]
         sample = [next(g) for _ in range(10000)]
-        actual = [float(sum(1 for n in sample if n == t)) / len(sample) for t in [0, 1, 2, 3]]
+        actual = [float(sum(1 for n in sample if n == t)) / len(sample) for t in range(10)]
+        self.assertAlmostEqual(1, sum(i for i in actual), delta=0.01)
         self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)), delta=0.01)
+
 
 
 class SkipNodeTestCase(unittest.TestCase):
