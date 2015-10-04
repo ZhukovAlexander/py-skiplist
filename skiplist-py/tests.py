@@ -4,6 +4,8 @@ import collections
 from skiplist import Skiplist, NIL
 from iterators import LevelNodeIterator, AllNodesIterator, geometric
 
+from skiplist import _Skipnode, nil
+
 
 class DataStructTestCase(unittest.TestCase):
     def test_nil_always_false(self):
@@ -92,6 +94,12 @@ class DistributionTestCase(unittest.TestCase):
         sample = [next(g) for _ in range(10000)]
         actual = [float(sum(1 for n in sample if n == t)) / len(sample) for t in [0, 1, 2, 3]]
         self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)), delta=0.01)
+
+
+class SkipNodeTestCase(unittest.TestCase):
+    def test_iter_level(self):
+        sl = Skiplist(foo='bar')
+        self.assertEqual(list(sl.head.iter_level()), [sl.head, sl.head.nxt[0], sl.head.nxt[0].nxt[0]])
 
 if __name__ == '__main__':
     unittest.main()

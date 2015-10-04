@@ -8,10 +8,10 @@ class LevelNodeIterator(object):
         self.l = level
 
     def __iter__(self):
-        node = self.s.head.next[self.l]
-        while node.next:
+        node = self.s.head.nxt[self.l]
+        while node.nxt:
             yield node
-            node = node.next[self.l]
+            node = node.nxt[self.l]
         raise StopIteration
 
 
