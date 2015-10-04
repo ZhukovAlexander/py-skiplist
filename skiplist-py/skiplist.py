@@ -28,7 +28,6 @@ class _Skipnode(object):
         self.data = data
         self.nxt = nxt
 
-
     def iter_level(self, level=0):
         return chain([self], self.nxt[level].iter_level() if self.nxt and self.nxt[level] else [])
 
