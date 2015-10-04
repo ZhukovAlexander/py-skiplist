@@ -29,7 +29,7 @@ class _Skipnode(object):
         self.nxt = nxt
 
     def iter_level(self, level=0):
-        return chain([self], self.nxt[level].iter_level() if self.nxt and self.nxt[level] else [])
+        return chain([self], self.nxt[level].iter_level()) if not isinstance(self.key, NIL) else iter([])
 
 
 nil = _Skipnode(NIL(), None, [])
@@ -69,7 +69,7 @@ class Skiplist(collections.MutableMapping):
         self.remove(key)
 
     def _iter_level(self, level=0):
-        return self.head.iter_level(level)
+        return self.head.nxt[level].iter_level(level)
 
     def __iter__(self):
         """Iterate over values in sorted order"""
@@ -142,7 +142,7 @@ class Skiplist(collections.MutableMapping):
         self._size -= 1
 
     def iteritems(self):
-        return ((node.key, node.data) for node in LevelNodeIterator(self))
+        return ((node.key, node.data) for node in self._iter_level())
 
     def iterkeys(self):
         return (item[0] for item in self.iteritems())

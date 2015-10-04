@@ -98,11 +98,10 @@ class DistributionTestCase(unittest.TestCase):
         self.assertAlmostEqual(0, sum(i - j for i, j in zip(expected, actual)), delta=0.01)
 
 
-
 class SkipNodeTestCase(unittest.TestCase):
     def test_iter_level(self):
-        sl = Skiplist(foo='bar')
-        self.assertEqual(list(sl.head.iter_level()), [sl.head, sl.head.nxt[0], sl.head.nxt[0].nxt[0]])
+        sl = Skiplist(foo='bar', bar='baz')
+        self.assertEqual(list(sl.head.nxt[0].iter_level()), [sl.head.nxt[0], sl.head.nxt[0].nxt[0]])
 
 if __name__ == '__main__':
     unittest.main()
