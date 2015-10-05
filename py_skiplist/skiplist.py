@@ -73,7 +73,13 @@ class Skiplist(collections.MutableMapping):
         return (node for _, node, _ in self._level(level))
 
     def _level(self, level=0):
-        return ((node, node.nxt[level], node.nxt[level].nxt[level]) for node in self.head.iter_level(level))
+        node = self.head
+        while node.nxt[level] is not self.tail:
+            yield node, node.nxt[level], node.nxt[level].nxt[level]
+            node = node.nxt[level]
+
+    def _all(self, l):
+        return ((prev, cur, nxt) for level in reversed(range(l)) for prev, cur, nxt in self._level(level))
 
     def __iter__(self):
         """Iterate over values in sorted order"""
@@ -91,7 +97,7 @@ class Skiplist(collections.MutableMapping):
     def find_node(self, key):
         """Find node with given key"""
         l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels
-        for node in AllNodesIterator(self, l):
+        for prev, node, nxt in self._all(l):
             if node.key == key:
                 return node
         raise KeyError('Key <{0}> not found'.format(key))
