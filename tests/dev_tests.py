@@ -2,19 +2,7 @@ from __future__ import absolute_import
 import unittest
 
 from py_skiplist.skiplist import Skiplist, NIL
-from py_skiplist.skiplist import LevelNodeIterator, AllNodesIterator, geometric
-
-
-class LevelIteratorTestCase(unittest.TestCase):
-    def test_iterator_default(self):
-        s = Skiplist(foo=1, bar=2)
-        self.assertListEqual(sorted(['foo', 'bar']), sorted(node.key for node in LevelNodeIterator(s)))
-
-
-class AllNodesIteratorTestCase(unittest.TestCase):
-    def test_iterator(self):
-        s = Skiplist(foo=1, bar=2)
-        self.assertListEqual(sorted(['foo', 'bar']), sorted(node.key for node in AllNodesIterator(s, 1)))
+from py_skiplist.skiplist import geometric
 
 
 class DistributionTestCase(unittest.TestCase):

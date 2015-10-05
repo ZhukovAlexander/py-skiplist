@@ -100,3 +100,5 @@ http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-579.pdf
 http://habrahabr.ru/post/250815/
 http://www.cs.tau.ac.il/~shanir/nir-pubs-web/Papers/OPODIS2006-BA.pdf
 http://stackoverflow.com/questions/2623086/is-a-variable-swap-guaranteed-to-be-atomic-in-python
+https://blog.filippo.io/building-python-modules-with-go-1-5/#thecompletedemosource
+http://stackoverflow.com/questions/3489560/purely-functional-concurrent-skip-list

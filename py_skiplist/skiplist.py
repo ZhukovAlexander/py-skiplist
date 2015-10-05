@@ -3,7 +3,7 @@ from math import log
 import collections
 from itertools import chain
 
-from iterators import LevelNodeIterator, AllNodesIterator, geometric
+from iterators import geometric
 
 
 class NIL(object):
@@ -21,18 +21,19 @@ class NIL(object):
 
 
 class _Skipnode(object):
-    __slots__ = ('data', 'nxt', 'key')
+    __slots__ = ('data', 'nxt', 'key', 'prev')
 
-    def __init__(self, key, data, nxt):
+    def __init__(self, key, data, nxt, prev):
         self.key = key
         self.data = data
         self.nxt = nxt
+        self.prev = prev
 
     def iter_level(self, level=0):
         return chain([self], self.nxt[level].iter_level()) if not isinstance(self.nxt[level].key, NIL) else iter([])
 
 
-nil = _Skipnode(NIL(), None, [])
+nil = _Skipnode(NIL(), None, [], [])
 
 
 class Skiplist(collections.MutableMapping):
@@ -44,7 +45,7 @@ class Skiplist(collections.MutableMapping):
         self._p = p
         self._max_levels = 1
         self._size = 0
-        self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels)
+        self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels, [])
         self.tail = nil
         self.distribution = distribution(p)
 
@@ -61,7 +62,7 @@ class Skiplist(collections.MutableMapping):
 
     def __getitem__(self, key):
         """Returns item with given index"""
-        return self.find_node(key).data
+        return self.find_node(key)[0].data
 
     def __setitem__(self, key, value):
         return self.insert(key, value)
@@ -96,23 +97,29 @@ class Skiplist(collections.MutableMapping):
 
     def find_node(self, key):
         """Find node with given key"""
-        l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels
-        for prev, node, nxt in self._all(l):
-            if node.key == key:
-                return node
+        return_value = None
+        prevs = [None] * self._max_levels
+        nexts = [None] * self._max_levels
+        l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
+        for level in reversed(range(l)):
+            for prev, node, nxt in self._level(level):
+                prevs[level] = prev
+                nexts[level] = nxt
+                if node.key == key:
+                    return node, prevs, nexts
         raise KeyError('Key <{0}> not found'.format(key))
 
     def insert(self, key, data):
         """Inserts data into appropriate position."""
 
         try:
-            self.find_node(key).data = data
+            self.find_node(key)[0].data = data
         except KeyError:
 
             # find position to insert
             update = self._find_update(key)
             node_height = next(self.distribution) + 1  # because height should be positive non-zero
-            new_node = _Skipnode(key, data, [None] * node_height)
+            new_node = _Skipnode(key, data, [None] * node_height, [None] * node_height)
 
             # if node's height is greater than number of levels
             # then add new levels, if not do nothing

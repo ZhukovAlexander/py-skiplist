@@ -1,13 +1,7 @@
 import unittest
 import collections
 
-from py_skiplist.skiplist import Skiplist, NIL
-from py_skiplist.skiplist import LevelNodeIterator, AllNodesIterator, geometric
-
-from py_skiplist.skiplist import _Skipnode, nil
-
-
-
+from py_skiplist.skiplist import Skiplist
 
 
 class InterfaceTestCase(unittest.TestCase):
