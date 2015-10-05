@@ -5,9 +5,9 @@ python:
 
 install: "pip install -r requirements.txt"
 before_script:
-  - "pep8 --ignore=E501 skiplist-py/"
+  - "pep8 --ignore=E501 py_skiplist/"
 # command to run tests
-script: coverage run --source skiplist-py skiplist-py/tests.py
+script: coverage run --source py_skiplist -m unittest discover tests "*_tests.py"
 
 after_success:
   coveralls

@@ -29,7 +29,7 @@ class _Skipnode(object):
         self.nxt = nxt
 
     def iter_level(self, level=0):
-        return chain([self], self.nxt[level].iter_level()) if not isinstance(self.key, NIL) else iter([])
+        return chain([self], self.nxt[level].iter_level()) if not isinstance(self.nxt[level].key, NIL) else iter([])
 
 
 nil = _Skipnode(NIL(), None, [])
@@ -45,6 +45,7 @@ class Skiplist(collections.MutableMapping):
         self._max_levels = 1
         self._size = 0
         self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels)
+        self.tail = nil
         self.distribution = distribution(p)
 
         for k, v in kwargs.iteritems():
@@ -55,7 +56,7 @@ class Skiplist(collections.MutableMapping):
 
     def __str__(self):
         return 'skiplist({{{}}})'.format(
-            ','.join('{key}: {value}'.format(key=node.key, value=node.data) for node in LevelNodeIterator(self))
+            ','.join('{key}: {value}'.format(key=node.key, value=node.data) for node in self._iter_level())
         )
 
     def __getitem__(self, key):
@@ -69,20 +70,19 @@ class Skiplist(collections.MutableMapping):
         self.remove(key)
 
     def _iter_level(self, level=0):
-        return self.head.nxt[level].iter_level(level)
+        return (node for _, node, _ in self._level(level))
+
+    def _level(self, level=0):
+        return ((node, node.nxt[level], node.nxt[level].nxt[level]) for node in self.head.iter_level(level))
 
     def __iter__(self):
         """Iterate over values in sorted order"""
-        return (node.key for node in self._iter_level())
+        return (node.key for _, node, _ in self._level())
 
     def _find_update(self, key):
         update = [None] * self._max_levels
         node = self.head
         for level in reversed(range(self._max_levels)):
-            # for node in LevelNodeIterator(self, level):
-            #     if node.nxt[level].key >= key:
-            #         update[level] = node
-            #         break
             while node.nxt[level].key < key:
                 node = node.nxt[level]
             update[level] = node

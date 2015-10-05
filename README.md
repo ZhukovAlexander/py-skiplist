@@ -96,3 +96,7 @@ decrease the maximum level of the list.
 [http://tech.puredanger.com/2007/10/03/skip-lists/](http://tech.puredanger.com/2007/10/03/skip-lists/)
 
 [http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree](http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree)
+http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-579.pdf
+http://habrahabr.ru/post/250815/
+http://www.cs.tau.ac.il/~shanir/nir-pubs-web/Papers/OPODIS2006-BA.pdf
+http://stackoverflow.com/questions/2623086/is-a-variable-swap-guaranteed-to-be-atomic-in-python
