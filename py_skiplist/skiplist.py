@@ -1,7 +1,7 @@
 from math import log
 
 import collections
-from itertools import chain
+from itertools import chain, takewhile, dropwhile
 
 from iterators import geometric
 
@@ -29,10 +29,6 @@ class _Skipnode(object):
         self.nxt = nxt
         self.prev = prev
 
-    def iter_level(self, level=0):
-        return chain([self], self.nxt[level].iter_level()) if not isinstance(self.nxt[level].key, NIL) else iter([])
-
-
 nil = _Skipnode(NIL(), None, [], [])
 
 
@@ -40,14 +36,14 @@ class Skiplist(collections.MutableMapping):
     """Class for randomized indexed skip list. The default
     distribution of node heights is geometric."""
 
-    def __init__(self, p=0.5, distribution=geometric, **kwargs):
+    def __init__(self, distribution=geometric(0.5), **kwargs):
 
-        self._p = p
         self._max_levels = 1
         self._size = 0
         self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels, [])
         self.tail = nil
-        self.distribution = distribution(p)
+        nil.prev.extend([self.head] * self._max_levels)
+        self.distribution = distribution
 
         for k, v in kwargs.iteritems():
             self[k] = v
@@ -57,12 +53,12 @@ class Skiplist(collections.MutableMapping):
 
     def __str__(self):
         return 'skiplist({{{}}})'.format(
-            ','.join('{key}: {value}'.format(key=node.key, value=node.data) for node in self._iter_level())
+            ', '.join('{key}: {value}'.format(key=node.key, value=node.data) for node in self._level())
         )
 
     def __getitem__(self, key):
         """Returns item with given index"""
-        return self.find_node(key)[0].data
+        return self.find_node(key).data
 
     def __setitem__(self, key, value):
         return self.insert(key, value)
@@ -70,17 +66,11 @@ class Skiplist(collections.MutableMapping):
     def __delitem__(self, key):
         self.remove(key)
 
-    def _iter_level(self, level=0):
-        return (node for _, node, _ in self._level(level))
-
     def _level(self, level=0):
-        node = self.head
-        while node.nxt[level] is not self.tail:
-            yield node, node.nxt[level], node.nxt[level].nxt[level]
+        node = self.head.nxt[level]
+        while node is not self.tail:
+            yield node
             node = node.nxt[level]
-
-    def _all(self, l):
-        return ((prev, cur, nxt) for level in reversed(range(l)) for prev, cur, nxt in self._level(level))
 
     def __iter__(self):
         """Iterate over values in sorted order"""
@@ -95,44 +85,75 @@ class Skiplist(collections.MutableMapping):
             update[level] = node
         return update
 
+    def _scan(self, key):
+        return_value = None
+        prevs = [self.head] * self._max_levels
+        nexts = [self.tail] * self._max_levels
+        # l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
+        for level in reversed(range(self._max_levels)):
+            node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(level))))
+            # for node in dropwhile(lambda node_: node_.key < key, self._level(level)):
+            if node.key == key:
+                return_value = node
+            else:
+                prevs[level] = node
+                    # nexts[level] = node
+
+        return return_value, prevs, nexts
+
     def find_node(self, key):
         """Find node with given key"""
-        return_value = None
-        prevs = [None] * self._max_levels
-        nexts = [None] * self._max_levels
-        l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
-        for level in reversed(range(l)):
-            for prev, node, nxt in self._level(level):
-                prevs[level] = prev
-                nexts[level] = nxt
-                if node.key == key:
-                    return node, prevs, nexts
-        raise KeyError('Key <{0}> not found'.format(key))
+        node, _, _ = self._scan(key)
+        if node is None:
+            raise KeyError('Key <{0}> not found'.format(key))
+        return node
 
     def insert(self, key, data):
-        """Inserts data into appropriate position."""
+            """Inserts data into appropriate position."""
 
-        try:
-            self.find_node(key)[0].data = data
-        except KeyError:
+            node, update, _ = self._scan(key)
+
+            if node:
+                # assert node.prev[0].key <= node.key
+                # assert node.nxt[0].key > node.key
+                node.data = data
+                return
+
+
 
             # find position to insert
-            update = self._find_update(key)
-            node_height = next(self.distribution) + 1  # because height should be positive non-zero
-            new_node = _Skipnode(key, data, [None] * node_height, [None] * node_height)
+            # update = self._find_update(key)
 
+            node_height = next(self.distribution) + 1  # because height should be positive non-zero
             # if node's height is greater than number of levels
             # then add new levels, if not do nothing
-            for level in range(self._max_levels, node_height):
-                update.append(self.head)
-                self.head.nxt.append(nil)
+            update.extend([self.head for _ in range(self._max_levels, node_height)])
+
+            self.head.nxt.extend([self.tail for _ in range(self._max_levels, node_height)])
+
+            self.tail.prev.extend([self.head for _ in range(self._max_levels, node_height)])
+
+            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(node_height)], update)
+
+            # assert all(update[l].key < key for l in range(len(update)))
+            # assert all(update[l].nxt[l].key > key for l in range(len(update)))
+            # assert new_node.prev[0].key < key
+            # assert update[0].key < key
+            # assert update[0].nxt[0].key > key
+
+
+
+
 
             # insert node to each level <= node's height after
             # corresponding node in 'update' list
             for level in range(node_height):
-                prev_node = update[level]
-                new_node.nxt[level] = prev_node.nxt[level]
-                prev_node.nxt[level] = new_node
+                update[level].nxt[level] = new_node
+                try:
+                  new_node.nxt[level].prev[level] = new_node
+                except:
+                    raise
+            assert update[0].nxt[0].key >= key
             self._size += 1
             self._max_levels = max(self._max_levels, node_height)
 
@@ -155,7 +176,7 @@ class Skiplist(collections.MutableMapping):
         self._size -= 1
 
     def iteritems(self):
-        return ((node.key, node.data) for node in self._iter_level())
+        return ((node.key, node.data) for node in self._level())
 
     def iterkeys(self):
         return (item[0] for item in self.iteritems())

@@ -1,5 +1,6 @@
 import unittest
 import collections
+from py_skiplist.iterators import uniform
 
 from py_skiplist.skiplist import Skiplist
 
@@ -65,6 +66,23 @@ class SkipListTestCase(unittest.TestCase):
         self.assertEqual('skiplist({})', str(sl))
         sl['1'] = 1
         self.assertEqual('skiplist({1: 1})', str(sl))
+
+    def test_589(self):
+        sl = Skiplist(distribution=uniform(2))
+        sl[10] = 10
+        sl[2] = 2
+        sl[3] = 3
+        self.assertTrue(True)
+
+    # @unittest.skip(1)
+    def test_sorted(self):
+        sl = Skiplist(distribution=uniform(2))
+        import random
+        l = [random.randint(1, 78) for i in range(10)]
+        for i in l:
+            sl[i] = i
+        # self.assertEqual(sl._scan(45)[1], sl._find_update(45))
+        self.assertEqual(sorted(set(l)), list(sl.iterkeys()))
 
 
 if __name__ == '__main__':
