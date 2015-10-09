@@ -20,18 +20,3 @@ class DistributionTestCase(unittest.TestCase):
 class DataStructTestCase(unittest.TestCase):
     def test_nil_always_false(self):
         self.assertFalse(NIL())
-
-
-class InternalsTestCase(unittest.TestCase):
-
-    def test_scan(self):
-        sl = Skiplist(distribution=uniform(2))
-        self.assertEqual((None, [sl.head], [sl.tail]), sl._scan('DoesNotExist'))
-
-        sl = Skiplist(distribution=uniform(2))
-        sl[1] = 1
-        sl[3] = 3
-        _, scan_res, r = sl._scan(2)
-        update = sl._find_update(2)
-        # self.assertEqual(scan_res, update)
-        # self.assertEqual(sl._scan(1)[1], sl._find_update(1))

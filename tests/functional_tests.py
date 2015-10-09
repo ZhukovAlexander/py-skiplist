@@ -74,14 +74,12 @@ class SkipListTestCase(unittest.TestCase):
         sl[3] = 3
         self.assertTrue(True)
 
-    # @unittest.skip(1)
     def test_sorted(self):
         sl = Skiplist(distribution=uniform(2))
         import random
         l = [random.randint(1, 78) for i in range(10)]
         for i in l:
             sl[i] = i
-        # self.assertEqual(sl._scan(45)[1], sl._find_update(45))
         self.assertEqual(sorted(set(l)), list(sl.iterkeys()))
 
 

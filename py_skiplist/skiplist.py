@@ -21,13 +21,16 @@ class NIL(object):
 
 
 class _Skipnode(object):
-    __slots__ = ('data', 'nxt', 'key', 'prev')
+    __slots__ = ('data', 'nxt', 'key', 'prev', 'height')
 
     def __init__(self, key, data, nxt, prev):
         self.key = key
         self.data = data
         self.nxt = nxt
         self.prev = prev
+
+        for level in range(len(prev)):
+            prev[level].nxt[level] = self.nxt[level].prev[level] = self
 
 nil = _Skipnode(NIL(), None, [], [])
 
@@ -42,7 +45,7 @@ class Skiplist(collections.MutableMapping):
         self._size = 0
         self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels, [])
         self.tail = nil
-        nil.prev.extend([self.head] * self._max_levels)
+        self.tail.prev.extend([self.head] * self._max_levels)
         self.distribution = distribution
 
         for k, v in kwargs.iteritems():
@@ -92,7 +95,6 @@ class Skiplist(collections.MutableMapping):
         # l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
         for level in reversed(range(self._max_levels)):
             node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(level))))
-            # for node in dropwhile(lambda node_: node_.key < key, self._level(level)):
             if node.key == key:
                 return_value = node
             else:
@@ -114,15 +116,8 @@ class Skiplist(collections.MutableMapping):
             node, update, _ = self._scan(key)
 
             if node:
-                # assert node.prev[0].key <= node.key
-                # assert node.nxt[0].key > node.key
                 node.data = data
                 return
-
-
-
-            # find position to insert
-            # update = self._find_update(key)
 
             node_height = next(self.distribution) + 1  # because height should be positive non-zero
             # if node's height is greater than number of levels
@@ -133,27 +128,12 @@ class Skiplist(collections.MutableMapping):
 
             self.tail.prev.extend([self.head for _ in range(self._max_levels, node_height)])
 
-            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(node_height)], update)
-
-            # assert all(update[l].key < key for l in range(len(update)))
-            # assert all(update[l].nxt[l].key > key for l in range(len(update)))
-            # assert new_node.prev[0].key < key
-            # assert update[0].key < key
-            # assert update[0].nxt[0].key > key
-
-
-
+            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(len(update))], update)
 
 
             # insert node to each level <= node's height after
             # corresponding node in 'update' list
-            for level in range(node_height):
-                update[level].nxt[level] = new_node
-                try:
-                  new_node.nxt[level].prev[level] = new_node
-                except:
-                    raise
-            assert update[0].nxt[0].key >= key
+
             self._size += 1
             self._max_levels = max(self._max_levels, node_height)
 
