@@ -76,22 +76,12 @@ class Skiplist(collections.MutableMapping):
             node = node.nxt[level]
 
     def __iter__(self):
-        """Iterate over values in sorted order"""
-        return (node.key for _, node, _ in self._level())
-
-    def _find_update(self, key):
-        update = [None] * self._max_levels
-        node = self.head
-        for level in reversed(range(self._max_levels)):
-            while node.nxt[level].key < key:
-                node = node.nxt[level]
-            update[level] = node
-        return update
+        """Iterate over keys in sorted order"""
+        return (node.key for node in self._level())
 
     def _scan(self, key):
         return_value = None
         prevs = [self.head] * self._max_levels
-        nexts = [self.tail] * self._max_levels
         # l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
         for level in reversed(range(self._max_levels)):
             node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(level))))
@@ -99,13 +89,12 @@ class Skiplist(collections.MutableMapping):
                 return_value = node
             else:
                 prevs[level] = node
-                    # nexts[level] = node
 
-        return return_value, prevs, nexts
+        return return_value, prevs
 
     def find_node(self, key):
         """Find node with given key"""
-        node, _, _ = self._scan(key)
+        node, _ = self._scan(key)
         if node is None:
             raise KeyError('Key <{0}> not found'.format(key))
         return node
@@ -113,7 +102,7 @@ class Skiplist(collections.MutableMapping):
     def insert(self, key, data):
             """Inserts data into appropriate position."""
 
-            node, update, _ = self._scan(key)
+            node, update = self._scan(key)
 
             if node:
                 node.data = data
@@ -130,28 +119,20 @@ class Skiplist(collections.MutableMapping):
 
             new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(len(update))], update)
 
-
-            # insert node to each level <= node's height after
-            # corresponding node in 'update' list
-
             self._size += 1
             self._max_levels = max(self._max_levels, node_height)
 
     def remove(self, key):
         """Removes node with given data. Raises KeyError if data is not in list."""
 
-        update = self._find_update(key)
-        if key != update[0].nxt[0].key:
+        node, update = self._scan(key)
+        if not node:
             raise KeyError
 
-        node = update[0].nxt[0]
-        node_height = len(node.nxt)
-        for level in range(node_height):
+        for level in range(len(node.nxt)):
             prevnode = update[level]
-            prevnode.nxt[level] = prevnode.nxt[level].nxt[level]
+            prevnode.nxt[level] = node.nxt[level]
 
-        while self._max_levels > 1 and self.head.nxt[level] == nil:
-            self._max_levels -= 1
         del node
         self._size -= 1
 
