@@ -36,7 +36,7 @@ class SkipListTestCase(unittest.TestCase):
 
     def test_insert(self):
         sl = Skiplist()
-        sl.insert(1, 1)
+        sl._insert(1, 1)
         e = sl[1]
         self.assertEqual(e, 1)
 
@@ -53,7 +53,7 @@ class SkipListTestCase(unittest.TestCase):
         self.assertTrue(sl['what'])
         del sl['what']
         self.assertRaises(KeyError, lambda: sl['what'])
-        self.assertRaises(KeyError, lambda: sl.remove('not here'))
+        self.assertRaises(KeyError, lambda: sl._remove('not here'))
 
     def test_init(self):
         sl = Skiplist(a=1, b=2)

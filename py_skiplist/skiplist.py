@@ -32,8 +32,6 @@ class _Skipnode(object):
         for level in range(len(prev)):
             prev[level].nxt[level] = self.nxt[level].prev[level] = self
 
-nil = _Skipnode(NIL(), None, [], [])
-
 
 class Skiplist(collections.MutableMapping):
     """Class for randomized indexed skip list. The default
@@ -43,8 +41,8 @@ class Skiplist(collections.MutableMapping):
 
         self._max_levels = 1
         self._size = 0
-        self.head = _Skipnode(None, 'HEAD', [nil] * self._max_levels, [])
-        self.tail = nil
+        self.tail = _Skipnode(NIL(), None, [], [])
+        self.head = _Skipnode(None, 'HEAD', [self.tail] * self._max_levels, [])
         self.tail.prev.extend([self.head] * self._max_levels)
         self.distribution = distribution
 
@@ -61,23 +59,26 @@ class Skiplist(collections.MutableMapping):
 
     def __getitem__(self, key):
         """Returns item with given index"""
-        return self.find_node(key).data
+        node, _ = self._scan(key)
+        if node is None:
+            raise KeyError('Key <{0}> not found'.format(key))
+        return node.data
 
     def __setitem__(self, key, value):
-        return self.insert(key, value)
+        return self._insert(key, value)
 
     def __delitem__(self, key):
-        self.remove(key)
+        self._remove(key)
+
+    def __iter__(self):
+        """Iterate over keys in sorted order"""
+        return (node.key for node in self._level())
 
     def _level(self, level=0):
         node = self.head.nxt[level]
         while node is not self.tail:
             yield node
             node = node.nxt[level]
-
-    def __iter__(self):
-        """Iterate over keys in sorted order"""
-        return (node.key for node in self._level())
 
     def _scan(self, key):
         return_value = None
@@ -92,14 +93,7 @@ class Skiplist(collections.MutableMapping):
 
         return return_value, prevs
 
-    def find_node(self, key):
-        """Find node with given key"""
-        node, _ = self._scan(key)
-        if node is None:
-            raise KeyError('Key <{0}> not found'.format(key))
-        return node
-
-    def insert(self, key, data):
+    def _insert(self, key, data):
             """Inserts data into appropriate position."""
 
             node, update = self._scan(key)
@@ -122,7 +116,7 @@ class Skiplist(collections.MutableMapping):
             self._size += 1
             self._max_levels = max(self._max_levels, node_height)
 
-    def remove(self, key):
+    def _remove(self, key):
         """Removes node with given data. Raises KeyError if data is not in list."""
 
         node, update = self._scan(key)
