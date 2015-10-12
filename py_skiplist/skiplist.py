@@ -74,8 +74,8 @@ class Skiplist(collections.MutableMapping):
         """Iterate over keys in sorted order"""
         return (node.key for node in self._level())
 
-    def _level(self, level=0):
-        node = self.head.nxt[level]
+    def _level(self, start=None, level=0):
+        node = start or self.head.nxt[level]
         while node is not self.tail:
             yield node
             node = node.nxt[level]
@@ -84,12 +84,14 @@ class Skiplist(collections.MutableMapping):
         return_value = None
         prevs = [self.head] * self._max_levels
         # l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
+        start = self.head.nxt[-1]
         for level in reversed(range(self._max_levels)):
-            node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(level))))
+            node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(start, level))))
             if node.key == key:
                 return_value = node
             else:
                 prevs[level] = node
+                start = node.nxt[level-1].prev[level-1]
 
         return return_value, prevs
 
@@ -111,7 +113,7 @@ class Skiplist(collections.MutableMapping):
 
             self.tail.prev.extend([self.head for _ in range(self._max_levels, node_height)])
 
-            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(len(update))], update)
+            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(node_height)], [update[l] for l in range(node_height)])
 
             self._size += 1
             self._max_levels = max(self._max_levels, node_height)
