@@ -91,7 +91,8 @@ class Skiplist(collections.MutableMapping):
                 return_value = node
             else:
                 prevs[level] = node
-                start = node.nxt[level-1].prev[level-1]
+                # do not need to scan from the head again, so start from this node at the lower level
+                start = node.nxt[level - 1].prev[level - 1]
 
         return return_value, prevs
 
