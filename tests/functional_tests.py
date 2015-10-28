@@ -68,7 +68,8 @@ class SkipListTestCase(unittest.TestCase):
         self.assertEqual('skiplist({1: 1})', str(sl))
 
     def test_589(self):
-        sl = Skiplist(distribution=uniform(2))
+        sl = Skiplist()
+        sl.distribution = uniform(2)
         sl[10] = 10
         sl[2] = 2
         sl[3] = 3

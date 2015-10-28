@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod, abstractproperty
 from math import log
 
 import collections
@@ -33,18 +34,112 @@ class _Skipnode(object):
             prev[level].nxt[level] = self.nxt[level].prev[level] = self
 
 
-class Skiplist(collections.MutableMapping):
+class SkiplistAbstractBase:
+    __metaclass__ = ABCMeta
     """Class for randomized indexed skip list. The default
     distribution of node heights is geometric."""
 
-    def __init__(self, distribution=geometric(0.5), **kwargs):
+    distribution = geometric(0.5)
 
-        self._max_levels = 1
+    @abstractproperty
+    def head(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def tail(self):
+        raise NotImplementedError
+
+    def _height(self):
+        return len(self.head.nxt)
+
+    def _level(self, start=None, level=0):
+        node = start or self.head.nxt[level]
+        while node is not self.tail:
+            yield node
+            node = node.nxt[level]
+
+    def _scan(self, key):
+        return_value = None
+        height = len(self.head.nxt)
+        prevs = [self.head] * height
+        start = self.head.nxt[-1]
+        for level in reversed(range(height)):
+            node = next(
+                dropwhile(
+                    lambda node_: node_.nxt[level].key <= key,
+                    chain([self.head], self._level(start, level))
+                )
+            )
+            if node.key == key:
+                return_value = node
+            else:
+                prevs[level] = node
+                # do not need to scan from the head again, so start from this node at the lower level
+                start = node.nxt[level - 1].prev[level - 1]
+
+        return return_value, prevs
+
+    def _insert(self, key, data):
+            """Inserts data into appropriate position."""
+
+            node, update = self._scan(key)
+
+            if node:
+                node.data = data
+                return
+
+            node_height = next(self.distribution) + 1  # because height should be positive non-zero
+            # if node's height is greater than number of levels
+            # then add new levels, if not do nothing
+            height = len(self.head.nxt)
+
+            update.extend([self.head for _ in range(height, node_height)])
+
+            self.head.nxt.extend([self.tail for _ in range(height, node_height)])
+
+            self.tail.prev.extend([self.head for _ in range(height, node_height)])
+
+            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(node_height)], [update[l] for l in range(node_height)])
+
+    def _remove(self, key):
+        """Removes node with given data. Raises KeyError if data is not in list."""
+
+        node, update = self._scan(key)
+        if not node:
+            raise KeyError
+
+        for level in range(len(node.nxt)):
+            update[level].nxt[level] = node.nxt[level]
+
+        del node
+
+
+class Skiplist(SkiplistAbstractBase, collections.MutableMapping):
+
+    def _remove(self, key):
+        super(Skiplist, self)._remove(key)
+        self._size -= 1
+
+    def _insert(self, key, data):
+        super(Skiplist, self)._insert(key, data)
+        self._size += 1
+
+    @property
+    def head(self):
+        return self._head
+
+    @property
+    def tail(self):
+        return self._tail
+
+    def __init__(self, **kwargs):
+        super(Skiplist, self).__init__()
+
+        self._tail = _Skipnode(NIL(), None, [], [])
+        self._head = _Skipnode(None, 'HEAD', [self.tail], [])
+        self._tail.prev.extend([self.head])
+
         self._size = 0
-        self.tail = _Skipnode(NIL(), None, [], [])
-        self.head = _Skipnode(None, 'HEAD', [self.tail] * self._max_levels, [])
-        self.tail.prev.extend([self.head] * self._max_levels)
-        self.distribution = distribution
 
         for k, v in kwargs.iteritems():
             self[k] = v
@@ -73,65 +168,6 @@ class Skiplist(collections.MutableMapping):
     def __iter__(self):
         """Iterate over keys in sorted order"""
         return (node.key for node in self._level())
-
-    def _level(self, start=None, level=0):
-        node = start or self.head.nxt[level]
-        while node is not self.tail:
-            yield node
-            node = node.nxt[level]
-
-    def _scan(self, key):
-        return_value = None
-        prevs = [self.head] * self._max_levels
-        # l = int(log(1.0 / self._p, len(self))) if self._size >= 16 else self._max_levels  # TODO: fix this shit
-        start = self.head.nxt[-1]
-        for level in reversed(range(self._max_levels)):
-            node = next(dropwhile(lambda node_: node_.nxt[level].key <= key, chain([self.head], self._level(start, level))))
-            if node.key == key:
-                return_value = node
-            else:
-                prevs[level] = node
-                # do not need to scan from the head again, so start from this node at the lower level
-                start = node.nxt[level - 1].prev[level - 1]
-
-        return return_value, prevs
-
-    def _insert(self, key, data):
-            """Inserts data into appropriate position."""
-
-            node, update = self._scan(key)
-
-            if node:
-                node.data = data
-                return
-
-            node_height = next(self.distribution) + 1  # because height should be positive non-zero
-            # if node's height is greater than number of levels
-            # then add new levels, if not do nothing
-            update.extend([self.head for _ in range(self._max_levels, node_height)])
-
-            self.head.nxt.extend([self.tail for _ in range(self._max_levels, node_height)])
-
-            self.tail.prev.extend([self.head for _ in range(self._max_levels, node_height)])
-
-            new_node = _Skipnode(key, data, [update[l].nxt[l] for l in range(node_height)], [update[l] for l in range(node_height)])
-
-            self._size += 1
-            self._max_levels = max(self._max_levels, node_height)
-
-    def _remove(self, key):
-        """Removes node with given data. Raises KeyError if data is not in list."""
-
-        node, update = self._scan(key)
-        if not node:
-            raise KeyError
-
-        for level in range(len(node.nxt)):
-            prevnode = update[level]
-            prevnode.nxt[level] = node.nxt[level]
-
-        del node
-        self._size -= 1
 
     def iteritems(self):
         return ((node.key, node.data) for node in self._level())

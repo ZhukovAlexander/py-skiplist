@@ -24,11 +24,12 @@ class DataStructTestCase(unittest.TestCase):
 
 class PropertiesTestCase(unittest.TestCase):
     def test_sorted(self):
-        sl = Skiplist(distribution=uniform(2))
+        sl = Skiplist()
+        sl.distribution = uniform(2)
         import random
         l = [random.randint(1, 78) for i in range(10)]
         for i in l:
             sl[i] = i
-        for level in range(sl._max_levels):
+        for level in range(len(sl.head.nxt)):
             self.assertEqual(sorted(set(l)), [node.key for node in sl._level(sl.head.nxt[-1], level)])
 
