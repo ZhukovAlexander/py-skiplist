@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from contextlib import contextmanager
 from math import log
 
 import collections
 from itertools import chain, takewhile, dropwhile
+from threading import Lock
 
 from iterators import geometric
 
@@ -34,6 +36,19 @@ class _Skipnode(object):
             prev[level].nxt[level] = self.nxt[level].prev[level] = self
 
 
+class LockableArray(list):
+    def __init__(self, seq=()):
+        super(LockableArray, self).__init__(seq)
+        self._lock = Lock()
+
+    @contextmanager
+    def lock(self):
+        try:
+            yield self._lock.acquire()
+        finally:
+            self._lock.release()
+
+
 class SkiplistAbstractBase:
     __metaclass__ = ABCMeta
     """Class for randomized indexed skip list. The default
@@ -61,7 +76,7 @@ class SkiplistAbstractBase:
     def _scan(self, key):
         return_value = None
         height = len(self.head.nxt)
-        prevs = [self.head] * height
+        prevs = LockableArray([self.head] * height)
         start = self.head.nxt[-1]
         for level in reversed(range(height)):
             node = next(
@@ -108,8 +123,9 @@ class SkiplistAbstractBase:
         if not node:
             raise KeyError
 
-        for level in range(len(node.nxt)):
-            update[level].nxt[level] = node.nxt[level]
+        with update.lock():
+            for level in range(len(node.nxt)):
+                update[level].nxt[level] = node.nxt[level]
 
         del node
 

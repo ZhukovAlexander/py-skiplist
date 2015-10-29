@@ -102,3 +102,9 @@ http://www.cs.tau.ac.il/~shanir/nir-pubs-web/Papers/OPODIS2006-BA.pdf
 http://stackoverflow.com/questions/2623086/is-a-variable-swap-guaranteed-to-be-atomic-in-python
 https://blog.filippo.io/building-python-modules-with-go-1-5/#thecompletedemosource
 http://stackoverflow.com/questions/3489560/purely-functional-concurrent-skip-list
+http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
+http://www.cs.umd.edu/~meesh/420/Notes/MountNotes/lecture11-skiplist.pdf
+
+https://github.com/amirouche/AjguDB
+http://blog.gocept.com/2013/07/15/reliable-file-updates-with-python/
+https://github.com/WoLpH/portalocker
