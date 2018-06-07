@@ -127,6 +127,14 @@ class SkiplistAbstractBase:
             for level in range(len(node.nxt)):
                 update[level].nxt[level] = node.nxt[level]
 
+        # trim not used head pointers
+        for i in reversed(range(len(self.head.nxt))):
+            if self.head.nxt[i] != self.tail:
+                break
+            elif i > 0:
+                head_node = self.head.nxt.pop()
+                del head_node
+
         del node
 
 
