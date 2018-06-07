@@ -77,20 +77,18 @@ class SkiplistAbstractBase:
         return_value = None
         height = len(self.head.nxt)
         prevs = LockableArray([self.head] * height)
-        start = self.head.nxt[-1]
+        node = self.head.nxt[-1]
         for level in reversed(range(height)):
             node = next(
                 dropwhile(
                     lambda node_: node_.nxt[level].key <= key,
-                    chain([self.head], self._level(start, level))
+                    chain([self.head], self._level(node, level))
                 )
             )
             if node.key == key:
                 return_value = node
             else:
                 prevs[level] = node
-                # do not need to scan from the head again, so start from this node at the lower level
-                start = node.nxt[level - 1].prev[level - 1]
 
         return return_value, prevs
 
@@ -131,7 +129,7 @@ class SkiplistAbstractBase:
         for i in reversed(range(len(self.head.nxt))):
             if self.head.nxt[i] != self.tail:
                 break
-            elif i > 0:
+            elif i > 0: # at least one pointer
                 head_node = self.head.nxt.pop()
                 del head_node
 
