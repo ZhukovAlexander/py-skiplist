@@ -129,7 +129,7 @@ class SkiplistAbstractBase:
         for i in reversed(range(len(self.head.nxt))):
             if self.head.nxt[i] != self.tail:
                 break
-            elif i > 0: # at least one pointer
+            elif i > 0:  # at least one pointer
                 head_node = self.head.nxt.pop()
                 del head_node
 
