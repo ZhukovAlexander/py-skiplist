@@ -1,7 +1,7 @@
 skiplist-python
 ===============
 
-An implementation of an indexed skip list data structure in python.
+Pure python implementation of a skiplist data structure.
 
 [![Build Status](https://travis-ci.org/ZhukovAlexander/py-skiplist.svg?branch=master)](https://travis-ci.org/ZhukovAlexander/py-skiplist)
 [![Coverage Status](https://coveralls.io/repos/ZhukovAlexander/py-skiplist/badge.svg?branch=master&service=github)](https://coveralls.io/github/ZhukovAlexander/py-skiplist?branch=master)
@@ -87,23 +87,14 @@ deleted the maximum element of the list and if so,
 decrease the maximum level of the list.
 
 **References**
-[*Skip list wikipedea article*](http://en.wikipedia.org/wiki/Skip_list),
-[*A Skip List Cookbook*](http://cg.scs.carleton.ca/~morin/teaching/5408/refs/p90b.pdf) by William Pugh
 
-[https://github.com/ryszard/goskiplist](https://github.com/ryszard/goskiplist)
+* [*Skip list wikipedea article*](http://en.wikipedia.org/wiki/Skip_list),
+* [*A Skip List Cookbook*](http://cg.scs.carleton.ca/~morin/teaching/5408/refs/p90b.pdf) by William Pugh
+* [Skip List vs. Binary Search Tree on Stack Overflow
+](http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree)
+* [A Provably Correct Scalable Concurrent Skip
+List Whitepaper](http://www.cs.tau.ac.il/~shanir/nir-pubs-web/Papers/OPODIS2006-BA.pdf)
+* [Purely functional concurrent skip list
+ on Stack Overflow](http://stackoverflow.com/questions/3489560/purely-functional-concurrent-skip-list)
+* [http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx](http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx)
 
-[http://tech.puredanger.com/2007/10/03/skip-lists/](http://tech.puredanger.com/2007/10/03/skip-lists/)
-
-[http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree](http://stackoverflow.com/questions/256511/skip-list-vs-binary-tree)
-http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-579.pdf
-http://habrahabr.ru/post/250815/
-http://www.cs.tau.ac.il/~shanir/nir-pubs-web/Papers/OPODIS2006-BA.pdf
-http://stackoverflow.com/questions/2623086/is-a-variable-swap-guaranteed-to-be-atomic-in-python
-https://blog.filippo.io/building-python-modules-with-go-1-5/#thecompletedemosource
-http://stackoverflow.com/questions/3489560/purely-functional-concurrent-skip-list
-http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
-http://www.cs.umd.edu/~meesh/420/Notes/MountNotes/lecture11-skiplist.pdf
-
-https://github.com/amirouche/AjguDB
-http://blog.gocept.com/2013/07/15/reliable-file-updates-with-python/
-https://github.com/WoLpH/portalocker
