@@ -3,7 +3,7 @@ python:
   - "2.7"
   #- "3.4"
 
-install: "pip install -r requirements.txt"
+install: "pip install pep8 coveralls"
 before_script:
   - "pep8 --ignore=E501 py_skiplist/"
 # command to run tests
