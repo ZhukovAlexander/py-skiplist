@@ -26,16 +26,16 @@ Skip List Structure
 Each element is represented by a node, the level of 
 which is chosen randoml when the node is inserted
 without regard for the number of elements in the
-data structure. A *level i* node has *i* forward
-pointers, indexed 1 through *i*. There is no need
+data structure. A `level i` node has `i` forward
+pointers, indexed 1 through `i`. There is no need
 to store the level of a node in the node. Levels
-are capped at some appropriate constant *MaxLevel*.
+are capped at some appropriate constant `MaxLevel`.
 The *level of a list* is the maximum level currently
-in the list (or 1 if the list if empty). The *header*
+in the list (or 1 if the list if empty). The `header`
 of a list has forward pointers at levels one through
-*MaxLevel*. The forward pointers of the header at
+`MaxLevel`. The forward pointers of the header at
 levels higher than the current maximum level of the
-list point to NIL.
+list point to `NIL`.
 
 Skip List Algoritms
 ===================
@@ -46,11 +46,11 @@ extendable to support operations like "find the minimum key" or "find the next k
 
 Initialization
 --------------
-An element NIL is allocated and given a key
+An element `NIL` is allocated and given a key
 greater than any legal key. All levels of all
-skip lists are terminated with NIL. A new list
+skip lists are terminated with `NIL`. A new list
 has level 1 and all forward pointers of the list's
-header point to NIL.
+header point to `NIL`.
 
 Search Algorithm
 -----------------
@@ -65,19 +65,19 @@ it is in the list).
 
 At what level should the search be started? William's
 analysis suggests that ideally we should start
-at level *L* where we expect *log_{1/p}n* where
-*n* is the number of elements in the list and
-*p* is the fraction of nodes in level *i* that
-also have level *i+1* pointers. Starting a search
+at level `L` where we expect `log_{1/p}n` where
+`n` is the number of elements in the list and
+`p` is the fraction of nodes in level `i` that
+also have level `i+1` pointers. Starting a search
 at the maximum level in the list does not add more
 than a small constant to the expected search time.
 
 Insertion and Deletion Algorithm
 --------------------------------
 To insert or delete a node, we simply search and
-splice. A vector *update* is maintained so that when
-the search is complete, *update[i]* contains a pointer
-to the rightmost node of level *i*. The new node
+splice. A vector `update` is maintained so that when
+the search is complete, `update[i]` contains a pointer
+to the rightmost node of level `i`. The new node
 is of a random level.
 If the insertion generates a node with a greater level
 than the previous maximum, both *Maxlevel* 
