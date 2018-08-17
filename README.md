@@ -28,14 +28,18 @@ Example usage
 >>>sl = Skiplist(foo='bar', 'spam'='eggs')
 >>>sl
 'skiplist({"foo": "bar", "spam": "eggs"})'
+>>>
 >>>sl['foo']
 'bar'
+>>>
 >>>sl['foo'] = 'baz'
 >>>sl['foo']
 'baz'
+>>>
 >>>'spam' in sl
 True
->>> del sl['spam']
+>>>
+>>>del sl['spam']
 >>>sl
 'skiplist({"foo": "bar"})'
 ```
