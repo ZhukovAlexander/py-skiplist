@@ -21,6 +21,25 @@ performance, no input sequence consistently produces the
 worst-case performance (much like quicksort when the pivot
 element is chosen randomly).
 
+Example usage
+-------------
+
+```python
+>>>sl = Skiplist(foo='bar', 'spam'='eggs')
+>>>sl
+'skiplist({"foo": "bar", "spam": "eggs"})'
+>>>sl['foo']
+'bar'
+>>>sl['foo'] = 'baz'
+>>>sl['foo']
+'baz'
+>>>'spam' in sl
+True
+>>> del sl['spam']
+>>>sl
+'skiplist({"foo": "bar"})'
+```
+
 Skip List Structure
 --------------------
 Each element is represented by a node, the level of 
