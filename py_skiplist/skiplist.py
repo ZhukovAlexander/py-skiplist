@@ -14,6 +14,7 @@ class NIL(object):
     __slots__ = ()
 
     def __cmp__(self, other):
+        # NIL is always greater than the other
         return 1
 
     def __str__(self):
