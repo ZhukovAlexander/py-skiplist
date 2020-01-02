@@ -24,7 +24,7 @@ class InterfaceTestCase(unittest.TestCase):
     def test_pop(self):
         sl = Skiplist(john='Snow')
         self.assertEqual(sl.pop('john'), 'Snow')
-        self.assertRaises(lambda: sl.pop('Sansa'))
+        self.assertRaises(KeyError, lambda: sl.pop('Sansa'))
 
     def test_iteritems(self):
         sl = Skiplist(one=1, two=2)

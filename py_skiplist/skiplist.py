@@ -6,7 +6,7 @@ import collections
 from itertools import chain, takewhile, dropwhile
 from threading import Lock
 
-from iterators import geometric
+from .iterators import geometric
 
 
 class NIL(object):
@@ -17,10 +17,22 @@ class NIL(object):
         # NIL is always greater than the other
         return 1
 
+    def __lt__(self, other):
+        return False
+
+    def __le__(self, other):
+        return False
+
+    def __ge__(self, other):
+        return True
+
     def __str__(self):
         return 'NIL'
 
     def __nonzero__(self):
+        return False
+
+    def __bool__(self):
         return False
 
 
@@ -164,7 +176,7 @@ class Skiplist(SkiplistAbstractBase, collections.MutableMapping):
 
         self._size = 0
 
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             self[k] = v
 
     def __len__(self):
